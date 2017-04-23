@@ -1,0 +1,10 @@
+Note that in the current implementation we have introduced print function. We will now be using print statements in our test cases to check if your program executes correctly. Since we will not check if the generated icode/spim matches reference implementation, you can continue from either Assignment 4 or Assignment 5(Dead code elimination).
+
+////////////////////////
+
+Regarding grammar: The last line of every procedure should be a return statement. 
+
+////////////////////////
+
+program.hh:
+	bool variable_in_proc_map_check(string symbol); -> checks for procedure name in existing group of procedures

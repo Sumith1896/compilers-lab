@@ -1,0 +1,442 @@
+#ifndef AST_HH
+#define AST_HH
+
+#include<string>
+#include<iostream>
+#include<iomanip>
+#include<typeinfo>
+#include<list>
+
+#define AST_SPACE "         "
+#define AST_NODE_SPACE "            "
+#define AST_SUB_NODE_SPACE "               "
+#define SA_SPACE "      "
+
+using namespace std;
+
+class Ast;
+
+class Ast
+{
+protected:
+	typedef enum
+	{
+		zero_arity = 0,
+		unary_arity = 1,
+		binary_arity = 2,
+		ternary_arity = 3
+	}Ast_Arity;
+
+	Data_Type node_data_type;
+	Ast_Arity ast_num_child;
+	static int labelCounter, stringCounter;
+	static vector<string> break_label;
+	int lineno;
+	string get_new_label(){
+
+		return "label"+to_string(labelCounter++);
+	}
+	string get_new_string_label(){
+
+		return "string"+to_string(stringCounter++);
+	}
+
+public:
+	Ast();
+	~Ast();
+
+	virtual Data_Type get_data_type();
+	virtual void set_data_type(Data_Type dt);
+
+	virtual bool is_value_zero();
+
+	virtual bool check_ast();
+	virtual Symbol_Table_Entry & get_symbol_entry();
+
+	virtual void print(ostream & file_buffer) = 0;
+	virtual Code_For_Ast & compile() = 0;
+	virtual Code_For_Ast & create_store_stmt(Register_Descriptor * store_register);
+	virtual void print_assembly();
+	virtual void print_icode();
+
+};
+
+class Assignment_Ast:public Ast
+{
+	Ast * lhs;
+	Ast * rhs;
+
+public:
+	Assignment_Ast(Ast * temp_lhs, Ast * temp_rhs, int line);
+	~Assignment_Ast();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Name_Ast:public Ast
+{
+	Symbol_Table_Entry * variable_symbol_entry;
+
+public:
+	Name_Ast(string & name, Symbol_Table_Entry & var_entry, int line);
+	~Name_Ast();
+
+	Data_Type get_data_type();
+	Symbol_Table_Entry & get_symbol_entry();
+	void set_data_type(Data_Type dt);
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+	Code_For_Ast & create_store_stmt(Register_Descriptor * store_register);
+};
+
+template <class T>
+class Number_Ast:public Ast
+{
+	T constant;
+
+public:
+	Number_Ast(T number, Data_Type constant_data_type, int line);
+	~Number_Ast();
+
+	Data_Type get_data_type();
+	void set_data_type(Data_Type dt);
+	bool is_value_zero();
+
+	void print(ostream & file_buffer);
+	Code_For_Ast & compile();
+};
+
+class Relational_Expr_Ast:public Ast
+{
+	Ast * lhs_condition;
+	Ast * rhs_condition;
+	Relational_Op rel_op;
+
+public:
+	Relational_Expr_Ast(Ast * lhs, Relational_Op rop, Ast * rhs, int line);
+	~Relational_Expr_Ast();
+
+	Data_Type get_data_type();
+	void set_data_type(Data_Type dt);
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+	Code_For_Ast & compile();
+};
+
+class Boolean_Expr_Ast:public Ast
+{
+	Ast * lhs_op;
+	Ast * rhs_op;
+	Boolean_Op bool_op;
+
+public:
+	Boolean_Expr_Ast(Ast * lhs, Boolean_Op bop, Ast * rhs, int line);
+	~Boolean_Expr_Ast();
+
+	Data_Type get_data_type();
+	void set_data_type(Data_Type dt);
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Selection_Statement_Ast: public Ast {
+protected:
+	Ast* cond;
+	Ast* then_part;
+	Ast* else_part;
+public:
+	Selection_Statement_Ast(Ast * cond,Ast* then_part, Ast* else_part, int line);
+	~Selection_Statement_Ast();
+
+	Data_Type get_data_type();
+	void set_data_type(Data_Type dt);
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Iteration_Statement_Ast: public Ast {
+protected:
+	Ast* cond;
+	Ast* body;
+	bool is_do_form;
+public:
+	Iteration_Statement_Ast(Ast * cond, Ast* body, int line, bool do_form);
+	~Iteration_Statement_Ast();
+
+	Data_Type get_data_type();
+	void set_data_type(Data_Type dt);
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Switch_Statement_Ast: public Ast {
+protected:
+	Ast* expr;
+	vector<Ast*> const_v;
+	vector<Ast*> body_v;
+public:
+	Switch_Statement_Ast(Ast * expr, vector<Ast*> const_v, vector<Ast*> body_v, int line);
+	~Switch_Statement_Ast();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+
+class Arithmetic_Expr_Ast:public Ast
+{
+protected:
+	Ast * lhs;
+	Ast * rhs;
+
+public:
+	Arithmetic_Expr_Ast() {}
+	~Arithmetic_Expr_Ast();
+
+	Data_Type get_data_type();
+	void set_data_type(Data_Type dt);
+	bool check_ast();
+
+	virtual void print(ostream & file_buffer) = 0;
+	virtual Code_For_Ast & compile() = 0;
+};
+
+class Plus_Ast:public Arithmetic_Expr_Ast
+{
+public:
+	Plus_Ast(Ast * l, Ast * r, int line);
+	~Plus_Ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Minus_Ast:public Arithmetic_Expr_Ast
+{
+public:
+	Minus_Ast(Ast * l, Ast * r, int line);
+	~Minus_Ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Divide_Ast:public Arithmetic_Expr_Ast
+{
+public:
+	Divide_Ast(Ast * l, Ast * r, int line);
+	~Divide_Ast();
+
+	void print(ostream & file_buffer);
+	Code_For_Ast & compile();
+};
+
+class Mult_Ast:public Arithmetic_Expr_Ast
+{
+public:
+	Mult_Ast(Ast * l, Ast * r, int line);
+	~Mult_Ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Conditional_Operator_Ast: public Arithmetic_Expr_Ast
+{
+protected:
+	Ast* cond;
+public:
+	Conditional_Operator_Ast(Ast* cond, Ast* l, Ast* r, int line);
+	~Conditional_Operator_Ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class UMinus_Ast: public Arithmetic_Expr_Ast
+{
+public:
+	UMinus_Ast(Ast * l, Ast * r, int line);
+	~UMinus_Ast();
+	
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Label_Ast:public Ast
+{
+	string lbl;
+
+public:
+	Label_Ast(string label, int line);
+	~Label_Ast();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Goto_Label_Ast:public Ast
+{
+	string lbl;
+
+public:
+	Goto_Label_Ast(string label, int line);
+	~Goto_Label_Ast();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Break_Ast:public Ast
+{
+public:
+	Break_Ast(int line);
+	~Break_Ast();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Function_Call_Ast:public Ast 
+{
+	string func_name;
+	vector<Ast* > arguments;
+	Procedure* proc;
+
+public:
+	Function_Call_Ast(string func_name, vector<Ast* > arguments, Procedure* proc, int line);
+	~Function_Call_Ast();
+	Data_Type get_data_type();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+
+};
+
+class Return_Ast: public Ast {
+	Ast* ret_val;
+	string func_name;
+
+public:
+	Return_Ast(Ast* return_value, string func_name, int line);
+	~Return_Ast();
+	string get_func_name();
+	Data_Type get_data_type();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+
+};
+
+class Print_Ast:public Ast
+{
+	Ast* to_print;
+
+public:
+	Print_Ast(Ast* to_print_ast, int line);
+	~Print_Ast();
+	Data_Type get_data_type();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class String_Ast:public Ast
+{
+	string lbl;
+
+public:
+	String_Ast(string label, int line);
+	~String_Ast();
+	string get_string_label();
+	Data_Type get_data_type();
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+};
+
+class Array_Access_Ast:public Ast
+{
+	Symbol_Table_Entry * array_symbol_entry;
+	Ast* access_num;
+
+public:
+	Array_Access_Ast(Symbol_Table_Entry & var_entry, Ast* access_ast, int line);
+	~Array_Access_Ast();
+
+	Data_Type get_data_type();
+	Symbol_Table_Entry & get_symbol_entry();
+	void set_data_type(Data_Type dt);
+
+	bool check_ast();
+
+	void print(ostream & file_buffer);
+
+	Code_For_Ast & compile();
+	Code_For_Ast & create_store_stmt(Register_Descriptor * store_register);
+};
+
+class Sequence_Ast: public Ast{
+	list<Ast *> statement_list;
+	list<Icode_Stmt *> sa_icode_list;
+public:
+	Sequence_Ast(int line);
+	~Sequence_Ast();
+  void ast_push_back(Ast * ast);
+	void print(ostream & file_buffer);
+	Code_For_Ast & compile();
+	void print_assembly(ostream & file_buffer);
+	void print_icode(ostream & file_buffer);
+	void check_last_statement_is_return(int lineno);
+};
+
+#endif

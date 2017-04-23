@@ -1,0 +1,26 @@
+cs316 Assignment 1
+-------------------
+
+Submission deadline 17:00, Fri 20 Jan 2017. The submission will be on moodle.
+
+You have been given 
+	1. some valid and invalid input programs (Examples) for Level 1 of  
+	   our subset (please see http://www.cse.iitb.ac.in/~uday/sclp-web),
+	2. a complete grammar of Level 1(grammar.txt),
+        3. x86-64 based reference implementation (sclp14 and sclp16 for Ubuntu 
+           14.04 and 16.04)
+	4. a skeleton scanner specification (scanner.ll), 
+	5. a parser specification (parser.yy),
+        6. all class declarations and header files,
+	7. a reference library (separate versions for Ubuntu 14.04 and 
+	   Ubuntu 16.04) that implements the classes, and
+	8. associated Makefile.
+
+You have to complete the scanner and parser specifications to create your first
+compiler that accepts Level 1 of the language. The places that you need to fill
+in have been marked with the following comment
+
+	//ADD YOUR CODE HERE
+
+You can execute the reference implementations and examine various dumps to understand
+the behaviour of the compiler.

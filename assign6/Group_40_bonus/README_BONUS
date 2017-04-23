@@ -1,0 +1,60 @@
+For this lab (Assignment 6) we have implemented the following for bonus:
+
+- Array access has been implemented for both *global* and *local* arrays
+- Function overloading 
+- Switch case statements (with fall through implemented using jump table) (assign5) 
+- goto statements (goto to a user defined label) (assing4)
+- break statements (to break out of loops and switch case) (assing4)
+- for statements (with initialization lists)(assing4)
+- Function calls in arithmetic expressions 
+- Nested function calls
+
+DESCRIPTIONS:
+- Array access has been implemented for both *global* and *local* arrays
+Example: 
+	int array[3];
+	int a;
+	array[1] = 1;
+	a = 1 + array[1];
+	array[a] = a;
+	a = 1 + array[a-1];
+More exhaustive testcases can be found in bonus_test_files/local_array_access.c and bonus_test_files/global_array_access.c
+
+- Function overloading 
+Overloading of functions has now been permitted (execute bonus_test_files/overload.c and check spim output)
+	int TOH(float n, int x);
+	int TOH(float n);
+	void main();
+
+	main()
+	{
+	 print(TOH(1.0,1));
+	 print(TOH(1.0));
+	 return;
+	}
+
+	TOH(float n,int x)
+	{
+	 	return 2;
+	}
+
+	TOH(float n)
+	{
+	 	return 1;
+	}
+
+- Function calls in arithmetic expressions 
+This permits you to use say a int fn(int n) as follows
+	int a;
+	int n;
+	a = 1 + fn(n);
+Test case is present in bonus_test_file/func_in_arith.c
+
+- Nested function calls
+You could use it as
+	int a;
+	int n;
+	a = 1 + fn(fn(n));
+Have a look at the fancy McCarthy's 91 function ;) (bonus_test_files/nested_func.c)
+
+Description of the other bonus features has been given in the previous lab submissions.

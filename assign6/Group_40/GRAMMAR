@@ -1,0 +1,324 @@
+
+// ####################
+program: // MOD
+	declaration_list mult_procedure_definition
+;
+
+declaration_list: // MOD
+	mult_procedure_declaration
+|
+	variable_declaration_list
+	mult_procedure_declaration
+|
+	mult_procedure_declaration
+	variable_declaration_list
+;
+
+mult_procedure_definition:
+	procedure_definition 
+|
+	mult_procedure_definition
+	procedure_definition 
+;
+
+mult_procedure_declaration:
+	procedure_declaration 
+|
+	mult_procedure_declaration
+	procedure_declaration 
+;
+
+procedure_declaration: // MOD
+	VOID NAME '(' optional_argument_list ')' ';'
+|
+	INTEGER NAME '(' optional_argument_list ')' ';'
+|
+	FLOAT NAME '(' optional_argument_list ')' ';'
+;
+
+
+procedure_definition: // MOD
+	NAME '(' optional_argument_list ')'
+
+	'{' optional_variable_declaration_list
+
+	statement_list '}'
+;
+
+// ####################
+
+optional_variable_declaration_list:
+|
+	variable_declaration_list
+;
+
+variable_declaration_list:
+	variable_declaration
+|
+	variable_declaration_list variable_declaration
+;
+
+variable_declaration:
+	declaration ';'
+;
+
+declaration:
+	INTEGER name_list
+|
+	FLOAT name_list
+;
+
+name_list:
+	NAME
+|
+	NAME ',' name_list
+;
+
+statement_list:
+|
+	statement_list statement
+;
+
+statement:
+	assignment_statement
+|
+	conditional_statement
+|
+	loop_statement
+|
+	'{' statement_list '}'
+|
+	goto_statement
+|
+	label_statement
+|
+	break_statement
+|
+	switch_statement
+|
+	function_call_statement
+|
+	return_statement
+|
+	print_statement
+;
+
+function_call_statement:
+	function_call ';'
+;
+
+print_statement:
+	PRINT '(' arith_expression ')' ';'
+|
+	PRINT '(' STRING')' ';'
+;
+
+return_statement:
+	RETURN ';'
+|
+	RETURN arith_expression';'
+;
+
+conditional_statement:
+	IF '(' bool_expression ')' statement 		%prec THEN
+|
+	IF '(' bool_expression ')' statement ELSE statement		
+;
+
+loop_statement:
+	do_while_statement
+|
+	while_statement
+|
+	for_loop_statement
+;
+
+do_while_statement:
+	DO statement WHILE '(' bool_expression ')' ';'
+;
+
+while_statement:
+	WHILE '(' bool_expression ')' statement
+;
+
+// Make sure to call check_ast in assignment_statement and arith_expression
+// Refer to error_display.hh for displaying semantic errors if any
+assignment_statement:
+	variable ASSIGN arith_expression ';'
+;
+
+arith_expression:
+		//ADD RELEVANT CODE ALONG WITH GRAMMAR RULES HERE
+                // SUPPORT binary +, -, *, / operations, unary -, and allow parenthesization
+                // i.e. E -> (E)
+                // Connect the rules with the remaining rules given below
+	a_operand '+' a_operand
+|
+	a_operand '-' a_operand
+|
+	a_operand '*' a_operand
+|
+	a_operand '/' a_operand
+|
+	'-' a_operand %prec UMINUS
+|
+	'(' a_operand ')'
+|
+	bool_expression '?' a_operand ':' a_operand
+|
+	expression_term
+;
+
+bool_expression:
+	b_operand AND b_operand
+|
+	b_operand OR b_operand
+|
+	NOT b_operand
+|
+	'(' b_operand ')'
+|
+	rel_expression
+;
+
+
+rel_expression:
+	a_operand LT a_operand
+|
+	a_operand GT a_operand
+|
+	a_operand LEQ a_operand
+|
+	a_operand GEQ a_operand
+|
+	a_operand EQ a_operand
+|
+	a_operand NEQ  a_operand
+;
+
+a_operand:
+	arith_expression
+;
+
+b_operand:
+	bool_expression
+;
+
+// ############
+
+expression_term: // MOD
+	variable
+|
+	constant
+|
+	function_call
+;
+
+function_call:
+	NAME '(' optional_expression_list ')'
+;
+
+optional_expression_list:
+	// empty
+|
+	expression_list
+;
+
+expression_list:
+	arith_expression
+|
+	arith_expression ',' expression_list
+;
+
+// ############
+
+variable:
+	NAME
+;
+
+constant:
+	INTEGER_NUMBER
+|
+	DOUBLE_NUMBER
+;
+
+optional_initialization_list:
+	// empty
+|
+	initialization_list
+;
+
+initialization_list:
+	initialization
+|
+	initialization ',' initialization_list
+;
+
+initialization:
+	variable ASSIGN arith_expression
+;
+
+for_loop_statement:
+	FOR '(' optional_initialization_list ';' 
+	        bool_expression ';'
+	        optional_initialization_list ')'
+		statement
+;
+
+goto_statement:
+	GOTO NAME ';'
+;
+
+label_statement:
+	NAME ':'
+;
+
+break_statement:
+	BREAK ';'
+;
+
+switch_statement:
+	SWITCH '(' arith_expression ')' '{'
+	optional_csl
+	optional_dsl
+	'}'
+;
+
+optional_csl:
+	csl
+|
+	// empty
+;
+
+csl:
+	CASE constant ':' statement_list
+|
+	csl
+	CASE constant ':' statement_list
+;
+
+optional_dsl:
+	DEFAULT ':' statement_list
+|
+	// empty
+;
+
+// #######################
+
+optional_argument_list:
+	// empty
+|
+	argument_list
+;
+
+argument_list:
+	argument
+|
+	argument_list ',' argument
+;
+
+argument:
+	INTEGER	NAME
+|
+	FLOAT	NAME
+;

@@ -1,0 +1,9 @@
+Our current submission directory compiles with no dependecies.
+This submission was built on top of our Assignment 5 submission (including bonus which consisted SWITCH, FOR, BREAK, GOTO).
+
+Notes:
+1) We match the reference on most ocassions expect for the following two issues:
+- Some semantic checks that have not been incorporated in the reference implementation
+- Reference produces wrong offsets and hence incorrect spim code (refer http://moodle.iitb.ac.in/mod/forum/discuss.php?d=56769)
+2) We have kept in mind that for correct program the testing will be done by matching the output after running the spim code.
+3) We have incorporated the semantic checks as posted by Sir (http://moodle.iitb.ac.in/mod/forum/discuss.php?d=56395)

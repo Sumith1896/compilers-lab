@@ -1,0 +1,19 @@
+311c311,312
+< 				curr_stmt = new Compute_IC_Stmt(slt_d, new_opd, rhs_opd, lhs_opd);
+---
+> 				curr_stmt = new Compute_IC_Stmt(slt_d, new_opd, lhs_opd, rhs_opd);
+> 				break;
+314c315,316
+< 				curr_stmt = new Compute_IC_Stmt(sle_d, new_opd, rhs_opd, lhs_opd);
+---
+> 				curr_stmt = new Compute_IC_Stmt(sle_d, new_opd, lhs_opd, rhs_opd);
+> 				break;
+317c319,320
+< 				curr_stmt = new Compute_IC_Stmt(seq_d, new_opd, rhs_opd, lhs_opd);
+---
+> 				curr_stmt = new Compute_IC_Stmt(seq_d, new_opd, lhs_opd, rhs_opd);
+> 				break;
+334a338
+> 		if(rel_op == greater_equalto || rel_op == greater_than || rel_op == not_equalto) {
+336a341
+> 		}

@@ -1,0 +1,12 @@
+We have implemented the following for bonus in Assignment 6:
+- Function overloading
+- Function calls inside function calls
+- Function calls in expressions
+From previous labs
+- FOR
+- GOTO
+- BREAK
+- SWITCH CASE
+
+For test cases, have a look at bonus_test_files/overload.c and it's spim output.
+

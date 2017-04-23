@@ -1,0 +1,54 @@
+
+
+#ifndef PARSER_IH
+#define PARSER_IH
+
+#include <typeinfo>
+
+#include "common-classes.hh"
+#include "local-environment.hh"
+#include "error-display.hh"
+#include "user-options.hh"
+#include "symbol-table.hh"
+#include "ast.hh"
+#include "sequence-ast.hh"
+#include "procedure.hh"
+#include "program.hh"
+#include "parser.h"
+
+////////////////////// cfglp Parser functions ///////////////////////
+
+Procedure * current_procedure;
+
+//////////////////////////////////////////////////////////////////////
+
+inline void Parser::error(char const *msg)
+{
+    std::cerr << msg << '\n';
+}
+
+inline int Parser::lex()
+{
+    return d_scanner.lex();
+}
+
+inline void Parser::print()         
+{
+////////////////// cfglp print tokens ///////////////////////////////
+
+	if (command_options.is_show_tokens_selected())
+		d_scanner.display_token(d_token__);
+
+////////////////////////////////////////////////////////////////////
+}
+
+///////////////// Line Number /////////////////////////////////////
+
+int Parser::get_line_number()
+{
+	return d_scanner.get_scan_line_number();
+}
+
+///////////////////////////////////////////////////////////////////
+
+#endif

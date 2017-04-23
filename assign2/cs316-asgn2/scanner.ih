@@ -1,0 +1,10 @@
+
+
+#ifndef SCANNER_IH
+#define SCANNER_IH
+
+#include "scanner.h"
+#include "parser.h"
+
+#endif
+

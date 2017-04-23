@@ -1,0 +1,33 @@
+1. Code_For_Ast& <class>:compile()
+-Responsible for overall icode generation for ast node. Calls compile() functions for children ast nodes, creates icode statements for the root node and returns the final code blocks and code statements in correct order.
+-Calls following functions for using registers:
+	--get_reg(): From icode module, to get description of register holding the result of the object codeblock(code_for_ast)
+	--set_use_for_expr_result(): From reg_alloc, to mark the register as in use, so that it is not simultaneously used for other calculations. 
+	--reset_use_for_expr_result(): Same as above, but to unmark the register. 
+	--get_new_register(): From reg_alloc, to get description for a new register. 
+-Finally creates a list of Icode_Stmt, poplulates it with the icode generated and children nodes' icode blocks in order , which is finally used to initialize a Code_For_Ast instance and its reference is returned.
+-The basic building units of icode block are of the following types:
+	--Move_IC_Stmt
+	--Compute_IC_Stmt
+	--Control_Flow_IC_Stmt
+	--Label_IC_Stmt
+	which have been declared in icode module. These stmts use operands of specific types, such as 
+	--Mem_Addr_Opd
+	--Register_Addr_Opd
+	--Const_Opd
+	Instance of these operands are created and initialized according to context, which are then used to create icode statments. For example invoking correct version of get_new_register(reg-alloc module) based on the data type of root node.
+	Special care should be taken for ast nodes where double type is possible, because spim uses a different set of instructions for handling float/double operations.
+
+2. Code_For_Ast & Name_Ast::create_store_stmt(Register_Descriptor * store_register)
+-The function creates icode statements for storing the value held in store_register to the memory location of object name_ast which invocates this method. 
+-This function is called only from assignment_ast's compile function
+-The arguement store_register points to the register which holds the value to be stored
+-Move_IC_Stmt is created(its arguements depend on the data type of variable)
+-The memory location where the value needs to be stored, is held in the data member "variable_symbol_entry" of name_ast.
+-The function calls update_register(symbol-table.hh) on variable_symbol_entry with store_register as arguement. This will make the appropriate changes in the symbol table. This call is followed by reset_use_for_expr_result on store_register, the reason being that set_use_for_expr_result is called internally for this register by update_register. 
+
+3.void Sequence_Ast::print_assembly(ostream & file_buffer)
+-Iterates through the data member sa_icode_list and calls print_assembly function for each in order. 
+
+4.void Sequence_Ast::print_icode(ostream & file_buffer)
+-Iterates through the data member sa_icode_list and calls print_icode function for each in order. 
